@@ -56,7 +56,7 @@ export const constantRoutes = [    //配置路由，这里是个数组
       component: () => import('@/views/dashboard/index'),
       //有时，你可能希望将任意信息附加到路由上，如过渡名称、谁可以访问路由等。
       //这些事情可以通过接收属性对象的meta属性来实现，并且它可以在路由地址和导航守卫上都被访问到。
-      meta: { title: 'Dashboard', icon: 'dashboard' }  
+      meta: { title: '系统', icon: 'dashboard' }  
     }]
   },
 
@@ -65,7 +65,7 @@ export const constantRoutes = [    //配置路由，这里是个数组
     component: Layout,
     redirect: '/example/table',
     name: 'Example',
-    meta: { title: 'Example', icon: 'el-icon-s-help' },
+    meta: { title: '银联二维码', icon: 'el-icon-s-help' },
     children: [
       {
         path: 'table',
@@ -90,7 +90,7 @@ export const constantRoutes = [    //配置路由，这里是个数组
         path: 'index',
         name: 'Form',
         component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
+        meta: { title: '银联无卡', icon: 'form' }
       }
     ]
   },
@@ -103,7 +103,7 @@ export const constantRoutes = [    //配置路由，这里是个数组
     redirect: '/nested/menu1',
     name: 'Nested',
     meta: {
-      title: 'Nested',
+      title: '银联全渠道',
       icon: 'nested'
     },
     children: [
@@ -111,31 +111,31 @@ export const constantRoutes = [    //配置路由，这里是个数组
         path: 'menu1',
         component: () => import('@/views/nested/menu1/index'), // Parent router-view
         name: 'Menu1',
-        meta: { title: 'Menu1' },
+        meta: { title: '订单支付' },
         children: [
           {
             path: 'menu1-1',
             component: () => import('@/views/nested/menu1/menu1-1'),
             name: 'Menu1-1',
-            meta: { title: 'Menu1-1' }
+            meta: { title: '订单创建' }
           },
           {
             path: 'menu1-2',
             component: () => import('@/views/nested/menu1/menu1-2'),
             name: 'Menu1-2',
-            meta: { title: 'Menu1-2' },
+            meta: { title: '订单支付' },
             children: [
               {
                 path: 'menu1-2-1',
                 component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
                 name: 'Menu1-2-1',
-                meta: { title: 'Menu1-2-1' }
+                meta: { title: '订单支付查询' }
               },
               {
                 path: 'menu1-2-2',
                 component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
                 name: 'Menu1-2-2',
-                meta: { title: 'Menu1-2-2' }
+                meta: { title: '订单支付' }
               }
             ]
           },
@@ -143,7 +143,7 @@ export const constantRoutes = [    //配置路由，这里是个数组
             path: 'menu1-3',
             component: () => import('@/views/nested/menu1/menu1-3'),
             name: 'Menu1-3',
-            meta: { title: 'Menu1-3' }
+            meta: { title: '订单通知' }
           }
         ]
       },
@@ -151,7 +151,7 @@ export const constantRoutes = [    //配置路由，这里是个数组
         path: 'menu2',
         component: () => import('@/views/nested/menu2/index'),
         name: 'Menu2',
-        meta: { title: 'menu2' }
+        meta: { title: 'ATM取现' }
       }
     ]
   },
@@ -162,7 +162,7 @@ export const constantRoutes = [    //配置路由，这里是个数组
     children: [
       {
         path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
+        meta: { title: '其他', icon: 'link' }
       }
     ]
   },

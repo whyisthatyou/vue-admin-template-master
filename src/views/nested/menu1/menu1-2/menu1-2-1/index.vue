@@ -28,14 +28,26 @@ export default {
       {
         id: 'node1', // 节点的唯一标识
         x: 100, // 节点横坐标
-        y: 200, // 节点纵坐标
-        label: '起始点', // 节点文本
+        y: 100, // 节点纵坐标
+        label: '发起订单信息 \t \n 查询请求', // 节点文本
       },
       {
         id: 'node2',
         x: 300,
+        y: 100,
+        label: '接收订单查询请求',
+      },
+      {
+        id: 'node3',
+        x: 300,
         y: 200,
-        label: '目标点',
+        label: '查询cops_order_info \n,返回订单信息',
+      },
+      {
+        id: 'node4',
+        x: 100,
+        y: 300,
+        label: '返回结果',
       },
     ],
     // 边集
@@ -44,7 +56,17 @@ export default {
       {
         source: 'node1', // 起始点 id
         target: 'node2', // 目标点 id
-        label: '我是连线', // 边的文本
+        label: '', // 边的文本
+      },
+      {
+        source: 'node2', // 起始点 id
+        target: 'node3', // 目标点 id
+        label: '', // 边的文本
+      },
+      {
+        source: 'node3', // 起始点 id
+        target: 'node4', // 目标点 id
+        label: '', // 边的文本
       },
     ],
   }
@@ -60,7 +82,7 @@ export default {
     
       //  plugins: [toolbar1], // 配置 右键菜单 Menu 插件
         defaultNode: {
-    size: [60, 30], // 节点大小
+    size: [130, 30], // 节点大小
     type:'rect',       // 元素的图形
     // ...                 // 节点的其他配置
     // 节点样式配置
