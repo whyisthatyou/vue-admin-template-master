@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+     <!--告诉IE浏览器，IE8/9以及以后的版本都会以edge版本IE来渲染界面-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">  
+    <!-- width - viewport的宽度 height - viewport的高度
+         initial-scale - 初始的缩放比例
+         minimum-scale - 允许用户缩放到的最小比例
+         maximum-scale - 允许用户缩放到的最大比例
+         user-scalable - 用户是否可以手动缩放    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!--  ico图标在线制作： http://www.faviconico.org/  
+    rel="icon" 用于在网站标题旁边放置图标ico格式图片-->
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">  
+    <!--  网站标题-->
+    <title><%= webpackConfig.name %></title>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but <%= webpackConfig.name %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+    <!-- index.html里有id="app"的代码，src目录下的App.vue中也有id="app"的代码。
+      index.html中的#app指定绑定目标，而src目录下的App.vue里的#app提供填充内容，两者在运行时指的是同一个DOM元素。 -->
+  </body>
+</html>
