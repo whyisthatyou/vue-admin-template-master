@@ -2,6 +2,13 @@
   <div class="page-x">
     <!-- 【步骤1】 创建容器 -->
     <div class="g6-x" id="NPM" ref="containerG6"></div>
+    <div class="tips">
+        <span style="position:absolute;top:30px;right:50px;">用户名: admin</span>
+        <span style="position:absolute;top:60px;right:50px;"> 密码: any</span>
+          <span style="position:absolute;top:90px;right:50px;">id: 唯一编号</span>
+    <el-input type="test" :rows="2" placeholder="请输入内容" v-model=this.data.data.nodes.name></el-input>
+    <el-divider></el-divider>
+      </div>
   </div>
 </template>
 
@@ -179,8 +186,8 @@ this.graph.on('node:click', (e) => {
 
 <style scoped>
 .g6-x {
-  width: 800px;
-  height: 500px;
+  width: 1100px;
+  height: 600px;
   box-sizing: border-box;
   border: 1px solid #ccc;
 }
