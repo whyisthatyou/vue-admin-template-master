@@ -2,7 +2,7 @@
   <div class="page-x">
     <!-- 【步骤1】 创建容器 -->
     <div class="g6-x" id="NPM" ref="containerG6"></div>
-    <div class="tips">
+    <div class="tips"  id="tips" >
         <el-input id= "node_id" size="small" style="position:absolute;top:30px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].id>
          <template slot="prepend"> id  </template>
         </el-input>
@@ -24,6 +24,16 @@
          <p class="form-item" style="position:absolute;top:210px;right:40px;width: 150px;">
           <button @click.prevent="handleSubmit">更新属性</button>
         </p>
+        <p class="form-item" style="position:absolute;top:240px;right:40px;width: 150px;">
+          <button @click.prevent="handleAddLine">新增连接线</button>
+        </p>
+        <p class="form-item" style="position:absolute;top:270px;right:40px;width: 150px;">
+          <button @click.prevent="handleAddRect">新增矩形节点</button>
+        </p>
+        <p class="form-item" style="position:absolute;top:300px;right:40px;width: 150px;">
+          <button @click.prevent="handleSave">保存</button>
+        </p>
+
     <el-divider></el-divider>
       </div>
   </div>
@@ -88,7 +98,7 @@ export default {
       {
         source: 'node1', // 起始点 id
         target: 'node2', // 目标点 id
-        label: '', // 边的文本
+        label: '发送请求', // 边的文本
       },
       {
         source: 'node2', // 起始点 id
@@ -109,6 +119,25 @@ export default {
   
     // 初始化关系图，并渲染数据
     initGraph() {
+
+      const conextMenuContainer = document.createElement("ul");
+      conextMenuContainer.id = "contextMenu";
+
+      // create li
+      const firstLi = document.createElement("li");
+      firstLi.innerHTML = `查看层级`;
+      firstLi.style.display = "block";
+      conextMenuContainer.appendChild(firstLi);
+      document.getElementById("NPM").appendChild(conextMenuContainer);
+      document.getElementById("contextMenu").style.left='500px';
+      firstLi.style.left='500px';    // 使菜单出现在节点的右侧
+      conextMenuContainer.style.display = "block";
+      conextMenuContainer.style.left='500px';
+      conextMenuContainer.style.top='500px';
+      conextMenuContainer.style.position='absolute';
+     console.log(conextMenuContainer.style.left);
+      console.log(conextMenuContainer.style.top);
+
       // 【步骤4】 创建关系图
       const containerG6  = this.$refs.containerG6 // 获取容器（DOM元素）
       this.graph = new G6.Graph({
@@ -167,7 +196,7 @@ export default {
         width: containerG6.offsetWidth, // Number，必须，图的宽度
         height: containerG6.offsetHeight, // Number，必须，图的高度
         modes: {
-    default: ['drag-canvas', 'zoom-canvas', 'drag-node'], // 允许拖拽画布、放缩画布、拖拽节点
+    default:['drag-node'],      // ['drag-canvas', 'zoom-canvas', 'drag-node'], // 允许拖拽画布、放缩画布、拖拽节点
   },
      
       })
@@ -175,6 +204,13 @@ export default {
       // 【步骤5】 匹配数据源并渲染
       this.graph.data(this.graphData) // 读取 Step 2 中的数据源到图上
       this.graph.render() // 渲染图
+
+
+      //定义右键菜单项
+// 在实际开发中，右键菜单内容可以使用JSX或HTML中的模板
+  // 创建ul
+  
+
 
       // 鼠标进入节点
       this.graph.on('node:mouseenter', (e) => {
@@ -199,6 +235,29 @@ this.graph.on('node:click', (e) => {
   this.graph.setItemState(nodeItem, 'click', true); // 设置当前节点的 click 状态为 true
 });
 
+this.graph.on('node:contextmenu', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log(e.x);
+      console.log(e.y);
+      conextMenuContainer.style.left ='500px'; //使菜单出现在节点的右侧
+      conextMenuContainer.style.top = e.y +'px';
+      conextMenuContainer.style.display = "block";
+
+
+
+    
+   
+
+
+});
+
+
+
+
+
+
+
 
     }
     , handleSubmit() {
@@ -217,7 +276,27 @@ this.graph.on('node:click', (e) => {
       this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
       this.graph.render() ; // 渲染图
     }
-
+    ,handleAddLine(){
+      this.graphData.edges.push( {
+        source: 'node1', // 起始点 id
+        target: 'node2', // 目标点 id
+        label: '发送请求', // 边的文本
+      });
+      this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+      this.graph.render() ; // 渲染图
+    }
+    ,handleAddRect(){
+      this.graphData.nodes.push( {
+        id: 'node',
+        x: 500,
+        y: 100,
+        width:130,
+        height:30,
+        label: '新节点',
+      });
+      this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+      this.graph.render() ; // 渲染图
+    }
   },
   mounted() {
     this.initGraph();
@@ -236,6 +315,7 @@ this.graph.on('node:click', (e) => {
   box-sizing: border-box;
   border: 1px solid #ccc;
 }
+
 
 
 </style>
