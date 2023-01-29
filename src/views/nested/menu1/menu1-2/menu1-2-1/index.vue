@@ -3,10 +3,27 @@
     <!-- 【步骤1】 创建容器 -->
     <div class="g6-x" id="NPM" ref="containerG6"></div>
     <div class="tips">
-        <span style="position:absolute;top:30px;right:50px;">用户名: admin</span>
-        <span style="position:absolute;top:60px;right:50px;"> 密码: any</span>
-          <span style="position:absolute;top:90px;right:50px;">id: 唯一编号</span>
-    <el-input type="test" :rows="2" placeholder="请输入内容" v-model=this.data.data.nodes.name></el-input>
+        <el-input id= "node_id" size="small" style="position:absolute;top:30px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].id>
+         <template slot="prepend"> id  </template>
+        </el-input>
+         <el-input id= "node_x" size="small" style="position:absolute;top:60px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].x>
+         <template slot="prepend"> x   </template>
+        </el-input>
+         <el-input id= "node_y" size="small" style="position:absolute;top:90px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].y>
+         <template slot="prepend"> y   </template>
+        </el-input>
+        <el-input id= "node_width" size="small" style="position:absolute;top:120px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].width>
+         <template slot="prepend"> 宽度   </template>
+        </el-input>
+        <el-input id= "node_height" size="small" style="position:absolute;top:150px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].height>
+         <template slot="prepend"> 长度   </template>
+        </el-input>
+         <el-input id= "node_label" size="small" style="position:absolute;top:180px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].label>
+         <template slot="prepend">描述</template>
+         </el-input>
+         <p class="form-item" style="position:absolute;top:210px;right:40px;width: 150px;">
+          <button @click.prevent="handleSubmit">更新属性</button>
+        </p>
     <el-divider></el-divider>
       </div>
   </div>
@@ -36,24 +53,32 @@ export default {
         id: 'node1', // 节点的唯一标识
         x: 100, // 节点横坐标
         y: 100, // 节点纵坐标
+        width:130,
+        height:30,
         label: '发起订单信息 \t \n 查询请求', // 节点文本
       },
       {
         id: 'node2',
         x: 300,
         y: 100,
+        width:130,
+        height:30,
         label: '接收订单查询请求',
       },
       {
         id: 'node3',
         x: 300,
         y: 200,
+        width:130,
+        height:30,
         label: '查询cops_order_info \n,返回订单信息',
       },
       {
         id: 'node4',
         x: 100,
         y: 300,
+        width:130,
+        height:30,
         label: '返回结果',
       },
     ],
@@ -81,6 +106,7 @@ export default {
     }
   },
   methods: {
+  
     // 初始化关系图，并渲染数据
     initGraph() {
       // 【步骤4】 创建关系图
@@ -89,7 +115,9 @@ export default {
     
       //  plugins: [toolbar1], // 配置 右键菜单 Menu 插件
         defaultNode: {
-    size: [130, 30], // 节点大小
+    size:[130,30],
+    //指定边链接的点
+    anchorPoints: [[0.5, 0], [0.5, 1],[0,0.5],[1,0.5]],
     type:'rect',       // 元素的图形
     // ...                 // 节点的其他配置
     // 节点样式配置
@@ -110,9 +138,11 @@ export default {
     defaultEdge: {
     // ...                 // 边的其他配置
     // 边样式配置
+    shape: 'polyline',
     style: {
-      opacity: 0.6, // 边透明度
-      stroke: 'grey', // 边描边颜色
+      endArrow: true,
+      lineWidth: 2,
+      stroke: '#666'
     },
     // 边上的标签文本配置
     labelCfg: {
@@ -171,7 +201,22 @@ this.graph.on('node:click', (e) => {
 
 
     }
-
+    , handleSubmit() {
+      
+      let node_label =  document.getElementById('node_label').value;
+      this.graphData.nodes[0].label=node_label;
+      let node_id =  document.getElementById('node_id').value;
+      this.graphData.nodes[0].id=node_id;
+      let node_x =  document.getElementById('node_x').value;
+      this.graphData.nodes[0].x=node_x;
+      let node_y =  document.getElementById('node_y').value;
+      this.graphData.nodes[0].y=node_y;
+      let node_height =  document.getElementById('node_height').value;
+      let node_width =  document.getElementById('node_width').value;
+      this.graphData.nodes[0].size=[node_width,node_height];
+      this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+      this.graph.render() ; // 渲染图
+    }
 
   },
   mounted() {
@@ -186,9 +231,11 @@ this.graph.on('node:click', (e) => {
 
 <style scoped>
 .g6-x {
-  width: 1100px;
+  width: 950px;
   height: 600px;
   box-sizing: border-box;
   border: 1px solid #ccc;
 }
+
+
 </style>
