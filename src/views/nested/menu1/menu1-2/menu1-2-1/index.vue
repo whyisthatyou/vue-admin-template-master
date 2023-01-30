@@ -1,7 +1,18 @@
 <template>
   <div class="page-x">
     <!-- 【步骤1】 创建容器 -->
-    <div class="g6-x" id="NPM" ref="containerG6"></div>
+    <div class="g6-x" id="NPM" ref="containerG6">
+      <ul v-show="true" :style="css_style" class="contextmenu">
+      <!-- <li v-if="rightClickItem.fileType==99" @click="handleClickFolder(rightClickItem)">打开</li>
+      <li @click="handleDelete(rightClickItem)">删除</li>
+      <li @click="handleDownloadFile(rightClickItem)" v-if="rightClickItem.fileType!=99">下载</li>
+      <li @click="handlePreviewFile(rightClickItem)" v-if="rightClickItem.fileType!=99">预览</li>
+      <li @click="handleUpdate(rightClickItem)">编辑</li> -->
+      <li>复制</li>
+      <li>删除</li>
+    </ul>
+
+    </div>
     <div class="tips"  id="tips" >
         <el-input id= "node_id" size="small" style="position:absolute;top:30px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].id>
          <template slot="prepend"> id  </template>
@@ -55,6 +66,8 @@ export default {
   data() {
     return {
       graph: null,
+      //将右键菜单项style：css_style做成变量  初始值给负值将菜单项移到图外，右键点击后再移回来
+      css_style:{left:-300+'px',top:-300+'px'}, 
       // 【步骤3】 准备数据
       graphData: {
         // 点集
@@ -111,6 +124,7 @@ export default {
         label: '', // 边的文本
       },
     ],
+
   }
       
     }
@@ -120,23 +134,7 @@ export default {
     // 初始化关系图，并渲染数据
     initGraph() {
 
-      const conextMenuContainer = document.createElement("ul");
-      conextMenuContainer.id = "contextMenu";
 
-      // create li
-      const firstLi = document.createElement("li");
-      firstLi.innerHTML = `查看层级`;
-      firstLi.style.display = "block";
-      conextMenuContainer.appendChild(firstLi);
-      document.getElementById("NPM").appendChild(conextMenuContainer);
-      document.getElementById("contextMenu").style.left='500px';
-      firstLi.style.left='500px';    // 使菜单出现在节点的右侧
-      conextMenuContainer.style.display = "block";
-      conextMenuContainer.style.left='500px';
-      conextMenuContainer.style.top='500px';
-      conextMenuContainer.style.position='absolute';
-     console.log(conextMenuContainer.style.left);
-      console.log(conextMenuContainer.style.top);
 
       // 【步骤4】 创建关系图
       const containerG6  = this.$refs.containerG6 // 获取容器（DOM元素）
@@ -196,7 +194,7 @@ export default {
         width: containerG6.offsetWidth, // Number，必须，图的宽度
         height: containerG6.offsetHeight, // Number，必须，图的高度
         modes: {
-    default:['drag-node'],      // ['drag-canvas', 'zoom-canvas', 'drag-node'], // 允许拖拽画布、放缩画布、拖拽节点
+          edit: ['click-select'],      // ['drag-canvas', 'zoom-canvas', 'drag-node'], // 允许拖拽画布、放缩画布、拖拽节点
   },
      
       })
@@ -240,9 +238,11 @@ this.graph.on('node:contextmenu', (e) => {
       e.stopPropagation();
       console.log(e.x);
       console.log(e.y);
-      conextMenuContainer.style.left ='500px'; //使菜单出现在节点的右侧
-      conextMenuContainer.style.top = e.y +'px';
-      conextMenuContainer.style.display = "block";
+      console.log(e)
+      this.css_style.left =e.canvasX +'px'; //使菜单出现在节点的右侧
+      this.css_style.top = e.canvasY +'px';
+      this.css_style.display = "block";
+      this.css_style.position='absolute';
 
 
 
@@ -299,7 +299,10 @@ this.graph.on('node:contextmenu', (e) => {
     }
   },
   mounted() {
+
+
     this.initGraph();
+
 
 
   }
@@ -316,6 +319,30 @@ this.graph.on('node:contextmenu', (e) => {
   border: 1px solid #ccc;
 }
 
+
+.contextmenu {
+  margin: 0;
+  background: #fff;
+  z-index: 3000;
+  position: absolute;
+  list-style-type: none;
+  padding: 5px 0;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #333;
+  box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.contextmenu  li {
+  margin: 0;
+  padding: 7px 16px;
+  cursor: pointer;
+}
+
+.contextmenu li:hover {
+  background: #eee;
+}
 
 
 </style>

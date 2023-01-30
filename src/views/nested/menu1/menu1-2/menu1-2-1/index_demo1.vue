@@ -2,12 +2,53 @@
   <div class="page-x">
     <!-- 【步骤1】 创建容器 -->
     <div class="g6-x" id="NPM" ref="containerG6"></div>
+    <div class="tips"  id="tips" >
+        <el-input id= "node_id" size="small" style="position:absolute;top:30px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].id>
+         <template slot="prepend"> id  </template>
+        </el-input>
+         <el-input id= "node_x" size="small" style="position:absolute;top:60px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].x>
+         <template slot="prepend"> x   </template>
+        </el-input>
+         <el-input id= "node_y" size="small" style="position:absolute;top:90px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].y>
+         <template slot="prepend"> y   </template>
+        </el-input>
+        <el-input id= "node_width" size="small" style="position:absolute;top:120px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].width>
+         <template slot="prepend"> 宽度   </template>
+        </el-input>
+        <el-input id= "node_height" size="small" style="position:absolute;top:150px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].height>
+         <template slot="prepend"> 长度   </template>
+        </el-input>
+         <el-input id= "node_label" size="small" style="position:absolute;top:180px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].label>
+         <template slot="prepend">描述</template>
+         </el-input>
+         <p class="form-item" style="position:absolute;top:210px;right:40px;width: 150px;">
+          <button @click.prevent="handleSubmit">更新属性</button>
+        </p>
+        <p class="form-item" style="position:absolute;top:240px;right:40px;width: 150px;">
+          <button @click.prevent="handleAddLine">新增连接线</button>
+        </p>
+        <p class="form-item" style="position:absolute;top:270px;right:40px;width: 150px;">
+          <button @click.prevent="handleAddRect">新增矩形节点</button>
+        </p>
+        <p class="form-item" style="position:absolute;top:300px;right:40px;width: 150px;">
+          <button @click.prevent="handleSave">保存</button>
+        </p>
+
+    <el-divider></el-divider>
+      </div>
   </div>
 </template>
 
 <script>
 // 【步骤2】 引入G6
 import G6 from '@antv/g6'
+
+
+// 配置右键菜单
+
+
+
+
 
 export default {
   name: "Started",
@@ -17,56 +58,289 @@ export default {
       // 【步骤3】 准备数据
       graphData: {
         // 点集
-        nodes: [
-          {
-            id: "node1", // String，该节点存在则必须，节点的唯一标识
-            x: 100, // Number，可选，节点位置的 x 值
-            y: 200 // Number，可选，节点位置的 y 值
-          },
-          {
-            id: "node2", // String，该节点存在则必须，节点的唯一标识
-            x: 300, // Number，可选，节点位置的 x 值
-            y: 200 // Number，可选，节点位置的 y 值
-          }
-        ],
-        // 边集
-        edges: [
-          {
-            source: "node1", // String，必须，起始点 id
-            target: "node2" // String，必须，目标点 id
-          },
-        ]
-      }
+    nodes: [
+      {
+        id: 'node1', // 节点的唯一标识
+        x: 100, // 节点横坐标
+        y: 100, // 节点纵坐标
+        width:130,
+        height:30,
+        label: '发起订单信息 \t \n 查询请求', // 节点文本
+      },
+      {
+        id: 'node2',
+        x: 300,
+        y: 100,
+        width:130,
+        height:30,
+        label: '接收订单查询请求',
+      },
+      {
+        id: 'node3',
+        x: 300,
+        y: 200,
+        width:130,
+        height:30,
+        label: '查询cops_order_info \n,返回订单信息',
+      },
+      {
+        id: 'node4',
+        x: 100,
+        y: 300,
+        width:130,
+        height:30,
+        label: '返回结果',
+      },
+    ],
+    // 边集
+    edges: [
+      // 表示一条从 node1 节点连接到 node2 节点的边
+      {
+        source: 'node1', // 起始点 id
+        target: 'node2', // 目标点 id
+        label: '发送请求', // 边的文本
+      },
+      {
+        source: 'node2', // 起始点 id
+        target: 'node3', // 目标点 id
+        label: '', // 边的文本
+      },
+      {
+        source: 'node3', // 起始点 id
+        target: 'node4', // 目标点 id
+        label: '', // 边的文本
+      },
+    ],
+    conextMenuContainer: null,
+    firstLi: null,
+    secondLi: null,
+  }
+      
     }
   },
   methods: {
+  
     // 初始化关系图，并渲染数据
     initGraph() {
+
+
+
       // 【步骤4】 创建关系图
       const containerG6  = this.$refs.containerG6 // 获取容器（DOM元素）
       this.graph = new G6.Graph({
+    
+      //  plugins: [toolbar1], // 配置 右键菜单 Menu 插件
+        defaultNode: {
+    size:[130,30],
+    //指定边链接的点
+    anchorPoints: [[0.5, 0], [0.5, 1],[0,0.5],[1,0.5]],
+    type:'rect',       // 元素的图形
+    // ...                 // 节点的其他配置
+    // 节点样式配置
+    style: {
+      fill: 'steelblue', // 节点填充色
+      stroke: '#666', // 节点描边色
+      lineWidth: 1, // 节点描边粗细
+    },
+    // 节点上的标签文本配置
+    labelCfg: {
+      // 节点上的标签文本样式配置
+      style: {
+        fill: '#fff', // 节点标签文字颜色
+      },
+    },
+  },
+    // 边在默认状态下的样式配置（style）和其他配置
+    defaultEdge: {
+    // ...                 // 边的其他配置
+    // 边样式配置
+    shape: 'polyline',
+    style: {
+      endArrow: true,
+      lineWidth: 2,
+      stroke: '#666'
+    },
+    // 边上的标签文本配置
+    labelCfg: {
+      autoRotate: true, // 边上的标签文本根据边的方向旋转
+    },
+  },
+
+  // 节点不同状态下的样式集合
+  nodeStateStyles: {
+    // 鼠标 hover 上节点，即 hover 状态为 true 时的样式
+    hover: {
+      fill: 'lightsteelblue',
+    },
+    // 鼠标点击节点，即 click 状态为 true 时的样式
+    click: {
+      stroke: '#666',
+      lineWidth: 3,
+    },
+  },
+
         container: containerG6, // String | HTMLElement，必须，在 Step 1 中创建的容器 id 或容器本身
         width: containerG6.offsetWidth, // Number，必须，图的宽度
-        height: containerG6.offsetHeight // Number，必须，图的高度
+        height: containerG6.offsetHeight, // Number，必须，图的高度
+        modes: {
+          edit: ['click-select'],      // ['drag-canvas', 'zoom-canvas', 'drag-node'], // 允许拖拽画布、放缩画布、拖拽节点
+  },
+     
       })
 
       // 【步骤5】 匹配数据源并渲染
       this.graph.data(this.graphData) // 读取 Step 2 中的数据源到图上
       this.graph.render() // 渲染图
+
+
+      //定义右键菜单项
+// 在实际开发中，右键菜单内容可以使用JSX或HTML中的模板
+  // 创建ul
+  
+
+
+      // 鼠标进入节点
+      this.graph.on('node:mouseenter', (e) => {
+  const nodeItem = e.item; // 获取鼠标进入的节点元素对象
+  this.graph.setItemState(nodeItem, 'hover', true); // 设置当前节点的 hover 状态为 true
+});
+
+// 鼠标离开节点
+this.graph.on('node:mouseleave', (e) => {
+  const nodeItem = e.item; // 获取鼠标离开的节点元素对象
+  this.graph.setItemState(nodeItem, 'hover', false); // 设置当前节点的 hover 状态为 false
+});
+
+// 点击节点
+this.graph.on('node:click', (e) => {
+  // 先将所有当前是 click 状态的节点置为非 click 状态
+  const clickNodes = this.graph.findAllByState('node', 'click');
+  clickNodes.forEach((cn) => {
+    this.graph.setItemState(cn, 'click', false);
+  });
+  const nodeItem = e.item; // 获取被点击的节点元素对象
+  this.graph.setItemState(nodeItem, 'click', true); // 设置当前节点的 click 状态为 true
+});
+
+this.graph.on('node:contextmenu', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log(e.x);
+      console.log(e.y);
+      console.log(e)
+      this.conextMenuContainer.style.left =e.canvasX +'px'; //使菜单出现在节点的右侧
+      this.conextMenuContainer.style.top = e.canvasY +'px';
+      this.conextMenuContainer.style.display = "block";
+
+
+
+    
+   
+
+
+});
+
+
+
+
+
+
+
+
+    }
+    , handleSubmit() {
+      
+      let node_label =  document.getElementById('node_label').value;
+      this.graphData.nodes[0].label=node_label;
+      let node_id =  document.getElementById('node_id').value;
+      this.graphData.nodes[0].id=node_id;
+      let node_x =  document.getElementById('node_x').value;
+      this.graphData.nodes[0].x=node_x;
+      let node_y =  document.getElementById('node_y').value;
+      this.graphData.nodes[0].y=node_y;
+      let node_height =  document.getElementById('node_height').value;
+      let node_width =  document.getElementById('node_width').value;
+      this.graphData.nodes[0].size=[node_width,node_height];
+      this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+      this.graph.render() ; // 渲染图
+    }
+    ,handleAddLine(){
+      this.graphData.edges.push( {
+        source: 'node1', // 起始点 id
+        target: 'node2', // 目标点 id
+        label: '发送请求', // 边的文本
+      });
+      this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+      this.graph.render() ; // 渲染图
+    }
+    ,handleAddRect(){
+      this.graphData.nodes.push( {
+        id: 'node',
+        x: 500,
+        y: 100,
+        width:130,
+        height:30,
+        label: '新节点',
+      });
+      this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+      this.graph.render() ; // 渲染图
     }
   },
   mounted() {
-    this.initGraph()
+    this.conextMenuContainer = document.createElement("ul");
+    this.conextMenuContainer.class = "contextMenu";
+
+      // create li
+      this.firstLi = document.createElement("li");
+      this.firstLi.innerHTML = `复制`;
+      this.firstLi.style.display = "block";
+            // create li
+      this.secondLi = document.createElement("li");
+      this.secondLi.innerHTML = `删除`;
+      this.secondLi.style.display = "block";
+      this.conextMenuContainer.appendChild(this.firstLi);
+      this.conextMenuContainer.appendChild(this.secondLi);
+      document.getElementById("NPM").appendChild(this.conextMenuContainer);
+      this.conextMenuContainer.style.display = "none";
+      this.conextMenuContainer.style.position='absolute';
+
+    this.initGraph();
+
+
+
   }
 };
+
+   
 </script>
 
 <style scoped>
 .g6-x {
-  width: 800px;
-  height: 500px;
+  width: 950px;
+  height: 600px;
   box-sizing: border-box;
   border: 1px solid #ccc;
-  margin-left: 20px;
 }
+
+contextMenu {
+  margin: 0;
+  background: #fff;
+  z-index: 3000;
+  position: absolute;
+  list-style-type: none;
+  padding: 5px 0;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #333;
+  box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.contextMenu li {
+  margin: 0;
+  padding: 7px 16px;
+  cursor: pointer;
+}
+
+
 </style>
