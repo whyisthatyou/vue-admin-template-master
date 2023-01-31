@@ -28,7 +28,8 @@ if (process.env.NODE_ENV === 'production') {
   mockXHR()
 }
 
-
+import axios from 'axios'  // 安装axios后引入
+Vue.prototype.$axios = axios  // 将axios挂载到原型上方便使用
 
 // set ElementUI lang to EN
 Vue.use(ElementUI, { locale })

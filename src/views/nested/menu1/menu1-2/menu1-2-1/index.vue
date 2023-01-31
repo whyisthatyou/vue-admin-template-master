@@ -8,8 +8,13 @@
       <li @click="handleDownloadFile(rightClickItem)" v-if="rightClickItem.fileType!=99">下载</li>
       <li @click="handlePreviewFile(rightClickItem)" v-if="rightClickItem.fileType!=99">预览</li>
       <li @click="handleUpdate(rightClickItem)">编辑</li> -->
-      <li>复制</li>
-      <li>删除</li>
+      <li @click="handleNodeCopy()">复制</li>
+      <li @click="handleNodeDelete()">删除</li>
+    </ul>
+
+    <ul v-show="true" :style="edge_css_style" class="contextmenu">
+      <li @click="handleEdgeCopy()">复制</li>
+      <li @click="handleEdgeDelete()">删除</li>
     </ul>
 
     </div>
@@ -42,9 +47,14 @@
           <button @click.prevent="handleAddRect">新增矩形节点</button>
         </p>
         <p class="form-item" style="position:absolute;top:300px;right:40px;width: 150px;">
-          <button @click.prevent="handleSave">保存</button>
+          <button @click.prevent="handleSave">保存整个流程图</button>
         </p>
-
+        <p class="form-item" style="position:absolute;top:330px;right:40px;width: 150px;">
+          <button @click.prevent="handleReadSaveFile">读取备份流程图</button>
+        </p>
+        <p class="form-item" style="position:absolute;top:360px;right:40px;width: 150px;">
+          <button @click.prevent="handleChangeMode">编辑，拖拽切换</button>
+        </p>
     <el-divider></el-divider>
       </div>
   </div>
@@ -55,7 +65,6 @@
 import G6 from '@antv/g6'
 
 
-// 配置右键菜单
 
 
 
@@ -68,6 +77,7 @@ export default {
       graph: null,
       //将右键菜单项style：css_style做成变量  初始值给负值将菜单项移到图外，右键点击后再移回来
       css_style:{left:-300+'px',top:-300+'px'}, 
+      edge_css_style:{left:-300+'px',top:-300+'px'}, 
       // 【步骤3】 准备数据
       graphData: {
         // 点集
@@ -109,16 +119,19 @@ export default {
     edges: [
       // 表示一条从 node1 节点连接到 node2 节点的边
       {
+        id:'edges1',
         source: 'node1', // 起始点 id
         target: 'node2', // 目标点 id
         label: '发送请求', // 边的文本
       },
       {
+        id:'edges2',
         source: 'node2', // 起始点 id
         target: 'node3', // 目标点 id
         label: '', // 边的文本
       },
       {
+        id:'edges3',
         source: 'node3', // 起始点 id
         target: 'node4', // 目标点 id
         label: '', // 边的文本
@@ -126,7 +139,9 @@ export default {
     ],
 
   }
-      
+      ,nodeNo:"node1"
+      ,edgeNo:"edge1" 
+      ,dragMode:1,
     }
   },
   methods: {
@@ -189,11 +204,22 @@ export default {
       lineWidth: 3,
     },
   },
+  // 边不同状态下的样式集合
+  edgeStateStyles: {
+    hover: {
+      stroke: 'red',
+    },
+    // 鼠标点击边，即 click 状态为 true 时的样式
+    click: {
+      stroke: 'red',
+    },
+  },
 
         container: containerG6, // String | HTMLElement，必须，在 Step 1 中创建的容器 id 或容器本身
         width: containerG6.offsetWidth, // Number，必须，图的宽度
         height: containerG6.offsetHeight, // Number，必须，图的高度
         modes: {
+          default: ['drag-canvas', 'zoom-canvas', 'drag-node'], // 允许拖拽画布、放缩画布、拖拽节点
           edit: ['click-select'],      // ['drag-canvas', 'zoom-canvas', 'drag-node'], // 允许拖拽画布、放缩画布、拖拽节点
   },
      
@@ -210,18 +236,17 @@ export default {
   
 
 
-      // 鼠标进入节点
-      this.graph.on('node:mouseenter', (e) => {
+  // 鼠标进入节点
+  this.graph.on('node:mouseenter', (e) => {
   const nodeItem = e.item; // 获取鼠标进入的节点元素对象
+  this.nodeNo=nodeItem._cfg.id;  //鼠标划过时获取node的Id
   this.graph.setItemState(nodeItem, 'hover', true); // 设置当前节点的 hover 状态为 true
 });
-
 // 鼠标离开节点
 this.graph.on('node:mouseleave', (e) => {
   const nodeItem = e.item; // 获取鼠标离开的节点元素对象
   this.graph.setItemState(nodeItem, 'hover', false); // 设置当前节点的 hover 状态为 false
 });
-
 // 点击节点
 this.graph.on('node:click', (e) => {
   // 先将所有当前是 click 状态的节点置为非 click 状态
@@ -232,31 +257,48 @@ this.graph.on('node:click', (e) => {
   const nodeItem = e.item; // 获取被点击的节点元素对象
   this.graph.setItemState(nodeItem, 'click', true); // 设置当前节点的 click 状态为 true
 });
-
+// 点击右键，触发菜单项
 this.graph.on('node:contextmenu', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      console.log(e.x);
-      console.log(e.y);
-      console.log(e)
-      this.css_style.left =e.canvasX +'px'; //使菜单出现在节点的右侧
+      this.css_style.left =e.canvasX +'px'; // 使菜单出现在节点的右侧，e.canvasX是节点的坐标
       this.css_style.top = e.canvasY +'px';
       this.css_style.display = "block";
       this.css_style.position='absolute';
-
-
-
-    
-   
-
-
 });
 
 
+  // 鼠标进入边
+  this.graph.on('edge:mouseenter', (e) => {
+  const edgeItem = e.item; // 获取鼠标进入的节点元素对象
+  this.edgeNo=edgeItem._cfg.id;  //鼠标划过时获取node的Id
+  this.graph.setItemState(edgeItem, 'hover', true); // 设置当前节点的 hover 状态为 true
+});
+// 鼠标离开边
+this.graph.on('edge:mouseleave', (e) => {
+  const edgeItem = e.item; // 获取鼠标离开的节点元素对象
+  this.graph.setItemState(edgeItem, 'hover', false); // 设置当前节点的 hover 状态为 false
+});
+// 点击边
+this.graph.on('edge:click', (e) => {
+  // 先将所有当前是 click 状态的边置为非 click 状态
+  const clickEdges = this.graph.findAllByState('edge', 'click');
+  clickEdges.forEach((ce) => {
+    this.graph.setItemState(ce, 'click', false);
+  });
+  const edgeItem = e.item; // 获取被点击的边元素对象
+  this.graph.setItemState(edgeItem, 'click', true); // 设置当前边的 click 状态为 true
+});
+// 点击右键，触发菜单项
+this.graph.on('edge:contextmenu', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.edge_css_style.left =e.canvasX +'px'; // 使菜单出现在节点的右侧，e.canvasX是节点的坐标
+      this.edge_css_style.top = e.canvasY +'px';
+      this.edge_css_style.display = "block";
+      this.edge_css_style.position='absolute';
 
-
-
-
+});
 
 
     }
@@ -297,6 +339,94 @@ this.graph.on('node:contextmenu', (e) => {
       this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
       this.graph.render() ; // 渲染图
     }
+    ,handleNodeCopy(){
+      this.graphData.nodes.push( {
+        id: 'node',
+        x: 500,
+        y: 100,
+        width:130,
+        height:30,
+        label: '新节点',
+      });  // TODU 这里是创建了新节点，而不是复制节点
+      this.css_style.left =-300 +'px'; // 隐藏右键菜单项
+      this.css_style.top = -300 +'px'; // 隐藏右键菜单项
+      this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+      this.graph.render() ; // 渲染图
+      
+    }
+    ,handleNodeDelete(){
+      for (let i=0; i<this.graphData.nodes.length; i++){
+				if (this.graphData.nodes[i].id == this.nodeNo){
+					this.graphData.nodes.splice(i, 1)
+				}
+			}
+        this.css_style.left =-300 +'px'; // 隐藏右键菜单项
+        this.css_style.top = -300 +'px'; // 隐藏右键菜单项
+        this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+        this.graph.render() ; // 渲染图
+    }
+    ,handleEdgeCopy(){
+      this.graphData.edges.push( {
+        id:'edges111',
+        source: 'node1', // 起始点 id
+        target: 'node2', // 目标点 id
+        label: '', // 边的文本
+      });  // TODU 这里是创建了新节点，而不是复制节点
+      this.edge_css_style.left =-300 +'px'; // 隐藏右键菜单项
+      this.edge_css_style.top = -300 +'px'; // 隐藏右键菜单项
+      this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+      this.graph.render() ; // 渲染图
+      
+    }
+    ,handleEdgeDelete(){
+      console.log(this.graphData.edges.length)
+      for (let i=0; i<this.graphData.edges.length; i++){
+				if (this.graphData.edges[i].id == this.edgeNo){
+					this.graphData.edges.splice(i, 1)
+				}
+			}
+        console.log(this.graphData.edges.length)
+        this.edge_css_style.left =-300 +'px'; // 隐藏右键菜单项
+        this.edge_css_style.top = -300 +'px'; // 隐藏右键菜单项
+        this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+        this.graph.render() ; // 渲染图
+    }
+    ,handleSave(){
+      var data = JSON.stringify(this.graphData)
+      let uri = 'data:text/csv;charset=utf-8,\ufeff' + encodeURIComponent(data);
+      //通过创建a标签实现
+      let link = document.createElement("a");
+      link.href = uri;
+      //对下载的文件命名
+      link.download = "vue.json";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+
+    }
+
+    ,handleReadSaveFile(){
+        this.$axios.get('/data.json').then(res => {     // 获取public下的test.json文件数据
+        this.graphData=res.data;
+        this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+        this.graph.render() ; // 渲染图
+  })
+    }
+    ,handleChangeMode(){
+      if(this.dragMode == 1){
+        this.graph.setMode('edit');
+        this.dragMode=0;
+      }
+      else{
+        this.graph.setMode('default');
+        this.dragMode=1;
+      }
+      
+        this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+        this.graph.render() ; // 渲染图
+    }
+
   },
   mounted() {
 
