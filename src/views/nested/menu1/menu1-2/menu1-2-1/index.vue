@@ -32,7 +32,7 @@
          <template slot="prepend"> 宽度   </template>
         </el-input>
         <el-input id= "node_height" size="small" style="position:absolute;top:150px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].height>
-         <template slot="prepend"> 长度   </template>
+         <template slot="prepend"> 高度   </template>
         </el-input>
          <el-input id= "node_label" size="small" style="position:absolute;top:180px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].label>
          <template slot="prepend">描述</template>
@@ -84,14 +84,15 @@ export default {
     nodes: [
       {
         id: 'node1', // 节点的唯一标识
+        type:'rectNode',
         x: 100, // 节点横坐标
         y: 100, // 节点纵坐标
-        width:130,
-        height:30,
+        size:[130,30],
         label: '发起订单信息 \t \n 查询请求', // 节点文本
       },
       {
         id: 'node2',
+        type:'rectNode',
         x: 300,
         y: 100,
         width:130,
@@ -100,6 +101,7 @@ export default {
       },
       {
         id: 'node3',
+        type:'rectNode',
         x: 300,
         y: 200,
         width:130,
@@ -108,6 +110,7 @@ export default {
       },
       {
         id: 'node4',
+        type:'rectNode',
         x: 100,
         y: 300,
         width:130,
@@ -149,7 +152,69 @@ export default {
     // 初始化关系图，并渲染数据
     initGraph() {
 
+// 基于 rect 扩展出新的图形
+G6.registerNode('rectNode', {
+  getAnchorPoints() {
+      return [
+        [0, 0.5], // 左侧中间
+        [1, 0.5], // 右侧中间
+        [0.5, 1], // 右侧中间
+        [0.5, 0], // 右侧中间
+      ];
+    },
+    draw(cfg, group) {
+      group.addShape("rect", {
+      attrs: {
+        id:cfg.id,
+        x:cfg.x,
+        y:cfg.y,
+        width: cfg.size[0],
+        height: cfg.size[1],
+        fill: 'steelblue', // 节点填充色
+        stroke: '#666', // 节点描边色
+        lineWidth: 1, // 节点描边粗细
+        label:cfg.label,
+        index: "node"
+      },
+      draggable: true
+    });
+    // 如果 cfg 中定义了 style 需要同这里的属性进行融合
 
+    if (cfg.label) {
+      group.addShape("text", {
+        attrs: {
+          x: cfg.x+cfg.size[0] / 2,
+          y: cfg.y+cfg.size[1] / 2,
+          textAlign: "center",
+          textBaseline: "middle",
+          text: cfg.label,
+          fill: "#fff",
+          index: "node"
+        },
+        draggable: true
+      });
+    }
+    
+    const points = cfg.anchorPoints;
+    for (let index = 0; index < points.length; index++) {
+      group.addShape("circle", {
+        attrs: {
+          x: cfg.x+cfg.size[0] * points[index][0],
+          y: cfg.y+cfg.size[1] * points[index][1],
+          r: 5,
+          stroke: "block",
+          fill: "red",
+          index:'maodian',   //锚点标签
+        }
+      });
+    }
+
+    return group;
+  },
+
+
+    
+  },'rect',);
 
       // 【步骤4】 创建关系图
       const containerG6  = this.$refs.containerG6 // 获取容器（DOM元素）
@@ -300,6 +365,42 @@ this.graph.on('edge:contextmenu', (e) => {
 
 });
 
+this.graph.on('node:mousedown', (e) => {
+  const graph = this.graph;
+    if ("index" in e.shape.attrs) {
+      if (e.shape.attrs.index == "node") {
+        console.log("节点：拖动关键图形");
+      } else {
+        console.log("节点：拖动锚点");
+        if (e.item) {
+          const point = e.item.getContainer().get("children")[
+            parseInt(e.shape.attrs.index) + 1
+          ];
+          console.log(point)
+         // point.attrs.fill='#fff';
+         // point.attrs.stroke='#000';
+         // point.attrs.r=10;
+        }
+        const uid = Math.round(Math.random() * 100 + 100);
+       // this.graphData.nodes.push( 
+        graph.setMode("addedge");
+        graph.addItem("edge", {
+          id: uid,
+          type: "cubic",
+          source: e.item.getModel().id,
+          sourceAnchor: e.shape.attrs.index,
+          target: { x: e.x, y: e.y }
+        });
+        this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+        this.graph.render() ; // 渲染图
+      }
+    } else {
+      console.log("节点：拖动原生图形");
+    }
+  
+});
+
+
 
     }
     , handleSubmit() {
@@ -314,7 +415,8 @@ this.graph.on('edge:contextmenu', (e) => {
       this.graphData.nodes[0].y=node_y;
       let node_height =  document.getElementById('node_height').value;
       let node_width =  document.getElementById('node_width').value;
-      this.graphData.nodes[0].size=[node_width,node_height];
+      this.graphData.nodes[0].size=[parseInt(node_width),parseInt(node_height)];   // 这里size里的值必须是整数而不是字符串
+      console.log(this.graphData.nodes[0].size)
       this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
       this.graph.render() ; // 渲染图
     }
