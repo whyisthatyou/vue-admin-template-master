@@ -14,9 +14,13 @@
 
     <ul v-show="true" :style="edge_css_style" class="contextmenu">
       <li @click="handleEdgeCopy()">复制</li>
+      <li @click="handleEdgeEdit()">编辑</li>
       <li @click="handleEdgeDelete()">删除</li>
     </ul>
-
+    <el-col :span="21">
+    <el-input id= "edge_label"  @change="handlerEdgeLabelChange" @keyup.enter.native="handlerEdgeLabelChange"  size="small" v-show="true" :style="edge_label_css_style"  type="test" :rows="1" placeholder="" v-model="edge_label_edit" >
+         </el-input>
+    </el-col>
     </div>
     <div class="tips"  id="tips" >
         <el-input id= "node_id" size="small" style="position:absolute;top:30px;right:40px;width: 150px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[0].id>
@@ -78,6 +82,9 @@ export default {
       //将右键菜单项style：css_style做成变量  初始值给负值将菜单项移到图外，右键点击后再移回来
       css_style:{left:-300+'px',top:-300+'px'}, 
       edge_css_style:{left:-300+'px',top:-300+'px'}, 
+      edge_label_css_style:{width: '140px',left:-300+'px',top:-300+'px'},
+      edge_label_edit:'',
+      edge_label_id:0,
       // 【步骤3】 准备数据
       graphData: {
         // 点集
@@ -88,6 +95,12 @@ export default {
         x: 100, // 节点横坐标
         y: 100, // 节点纵坐标
         size:[130,30],
+        anchorPoints:[
+        [0.5,0], // 左侧中间
+        [0.5, 1], // 右侧中间
+        [1,0.5], // 右侧中间
+        [0, 0.5], // 右侧中间
+      ],
         label: '发起订单信息 \t \n 查询请求', // 节点文本
       },
       {
@@ -97,6 +110,12 @@ export default {
         y: 100,
         width:130,
         height:30,
+        anchorPoints:[
+        [0.5,0], // 左侧中间
+        [0.5, 1], // 右侧中间
+        [1,0.5], // 右侧中间
+        [0, 0.5], // 右侧中间
+      ],
         label: '接收订单查询请求',
       },
       {
@@ -106,6 +125,12 @@ export default {
         y: 200,
         width:130,
         height:30,
+        anchorPoints:[
+        [0.5,0], // 左侧中间
+        [0.5, 1], // 右侧中间
+        [1,0.5], // 右侧中间
+        [0, 0.5], // 右侧中间
+      ],
         label: '查询cops_order_info \n,返回订单信息',
       },
       {
@@ -115,36 +140,26 @@ export default {
         y: 300,
         width:130,
         height:30,
+        anchorPoints:[
+        [0.5,0], // 左侧中间
+        [0.5, 1], // 右侧中间
+        [1,0.5], // 右侧中间
+        [0, 0.5], // 右侧中间
+      ],
         label: '返回结果',
       },
     ],
     // 边集
     edges: [
-      // 表示一条从 node1 节点连接到 node2 节点的边
-      {
-        id:'edges1',
-        source: 'node1', // 起始点 id
-        target: 'node2', // 目标点 id
-        label: '发送请求', // 边的文本
-      },
-      {
-        id:'edges2',
-        source: 'node2', // 起始点 id
-        target: 'node3', // 目标点 id
-        label: '', // 边的文本
-      },
-      {
-        id:'edges3',
-        source: 'node3', // 起始点 id
-        target: 'node4', // 目标点 id
-        label: '', // 边的文本
-      },
     ],
 
   }
       ,nodeNo:"node1"
       ,edgeNo:"edge1" 
-      ,dragMode:1,
+      ,dragMode:1
+      ,mousedownSource:"node1"
+      ,mousedownSourcePoint:[0.5,0]
+      ,
     }
   },
   methods: {
@@ -156,10 +171,10 @@ export default {
 G6.registerNode('rectNode', {
   getAnchorPoints() {
       return [
-        [0, 0.5], // 左侧中间
-        [1, 0.5], // 右侧中间
+        [0.5,0], // 左侧中间
         [0.5, 1], // 右侧中间
-        [0.5, 0], // 右侧中间
+        [1,0.5], // 右侧中间
+        [0, 0.5], // 右侧中间
       ];
     },
     draw(cfg, group) {
@@ -196,15 +211,17 @@ G6.registerNode('rectNode', {
     }
     
     const points = cfg.anchorPoints;
+
     for (let index = 0; index < points.length; index++) {
+      const a=index;
       group.addShape("circle", {
         attrs: {
           x: cfg.x+cfg.size[0] * points[index][0],
           y: cfg.y+cfg.size[1] * points[index][1],
           r: 5,
           stroke: "block",
-          fill: "red",
-          index:'maodian',   //锚点标签
+          fill: "white",
+          index:a,   //锚点标签
         }
       });
     }
@@ -245,7 +262,7 @@ G6.registerNode('rectNode', {
     defaultEdge: {
     // ...                 // 边的其他配置
     // 边样式配置
-    shape: 'polyline',
+    shape: 'cubic',      //  'polyline',
     style: {
       endArrow: true,
       lineWidth: 2,
@@ -370,28 +387,33 @@ this.graph.on('node:mousedown', (e) => {
     if ("index" in e.shape.attrs) {
       if (e.shape.attrs.index == "node") {
         console.log("节点：拖动关键图形");
+      } else if (e.shape.attrs.index in [0,1,2,3]){
+        console.log("节点：拖动锚点");
+        const uid = Math.round(Math.random() * 100 + 100);
+        this.mousedownSource=e.item.getModel().id;
+        this.mousedownSourcePoint=e.shape.attrs.index
+      }
+    } else {
+      console.log("节点：拖动原生图形");
+    }
+  
+});
+this.graph.on('node:mouseup', (e) => {
+  const graph = this.graph;
+    if ("index" in e.shape.attrs) {
+      if (e.shape.attrs.index == "node") {
+        console.log("节点：拖动关键图形");
       } else {
         console.log("节点：拖动锚点");
-        if (e.item) {
-          const point = e.item.getContainer().get("children")[
-            parseInt(e.shape.attrs.index) + 1
-          ];
-          console.log(point)
-         // point.attrs.fill='#fff';
-         // point.attrs.stroke='#000';
-         // point.attrs.r=10;
-        }
         const uid = Math.round(Math.random() * 100 + 100);
-       // this.graphData.nodes.push( 
-        graph.setMode("addedge");
-        graph.addItem("edge", {
-          id: uid,
-          type: "cubic",
-          source: e.item.getModel().id,
-          sourceAnchor: e.shape.attrs.index,
-          target: { x: e.x, y: e.y }
-        });
-        this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+        this.graphData.edges.push( {
+        id:uid,
+        source: this.mousedownSource, // 起始点 id
+        sourceAnchor: this.mousedownSourcePoint, // 起始的锚点
+        targetAnchor: e.shape.attrs.index,
+        target: e.item.getModel().id, // 目标点 id
+        label: '', // 边的文本
+      }); 
         this.graph.render() ; // 渲染图
       }
     } else {
@@ -399,7 +421,6 @@ this.graph.on('node:mousedown', (e) => {
     }
   
 });
-
 
 
     }
@@ -481,13 +502,11 @@ this.graph.on('node:mousedown', (e) => {
       
     }
     ,handleEdgeDelete(){
-      console.log(this.graphData.edges.length)
       for (let i=0; i<this.graphData.edges.length; i++){
 				if (this.graphData.edges[i].id == this.edgeNo){
-					this.graphData.edges.splice(i, 1)
+					this.graphData.edges.splice(i, 1)  //从数组中第i位删除一个元素
 				}
 			}
-        console.log(this.graphData.edges.length)
         this.edge_css_style.left =-300 +'px'; // 隐藏右键菜单项
         this.edge_css_style.top = -300 +'px'; // 隐藏右键菜单项
         this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
@@ -528,7 +547,31 @@ this.graph.on('node:mousedown', (e) => {
         this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
         this.graph.render() ; // 渲染图
     }
+    ,handleEdgeEdit(){
+      for (let i=0; i<this.graphData.edges.length; i++){
+				if (this.graphData.edges[i].id == this.edgeNo){
+          this.edge_label_css_style={width: '140px',left:this.graphData.edges[i].startPoint.x/2+this.graphData.edges[i].endPoint.x/2+'px',top:this.graphData.edges[i].startPoint.y/2+this.graphData.edges[i].endPoint.y/2+'px'}
+          this.edge_label_id=i;
+          console.log(this.edge_label_css_style);
+					console.log(this.graphData.edges[i]);
+          this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+          this.graph.render() ; // 渲染图
+				}
+			}
+        this.edge_css_style.left =-300 +'px'; // 隐藏右键菜单项
+        this.edge_css_style.top = -300 +'px'; // 隐藏右键菜单项
 
+    }
+    ,handlerEdgeLabelChange(){
+          this.graphData.edges[this.edge_label_id].label=this.edge_label_edit;
+          this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+          this.graph.render() ; // 渲染图
+        this.edge_label_css_style.left =-300 +'px'; // 隐藏右键菜单项
+        this.edge_label_css_style.top = -300 +'px'; // 隐藏右键菜单项
+
+    }
+
+    
   },
   mounted() {
 
