@@ -57,18 +57,15 @@
           <button @click.prevent="handleSubmit">更新属性</button>
         </p>
         <p class="form-item" style="position:absolute;top:360px;right:40px;width: 150px;">
-          <button @click.prevent="handleAddLine">新增连接线</button>
-        </p>
-        <p class="form-item" style="position:absolute;top:390px;right:40px;width: 150px;">
           <button @click.prevent="handleAddRect">新增矩形节点</button>
         </p>
-        <p class="form-item" style="position:absolute;top:420px;right:40px;width: 150px;">
+        <p class="form-item" style="position:absolute;top:390px;right:40px;width: 150px;">
           <button @click.prevent="handleSave">保存整个流程图</button>
         </p>
-        <p class="form-item" style="position:absolute;top:450px;right:40px;width: 150px;">
+        <p class="form-item" style="position:absolute;top:420px;right:40px;width: 150px;">
           <button @click.prevent="handleReadSaveFile">读取备份流程图</button>
         </p>
-        <p class="form-item" style="position:absolute;top:480px;right:40px;width: 150px;">
+        <p class="form-item" style="position:absolute;top:450px;right:40px;width: 150px;">
           <button @click.prevent="handleChangeMode">编辑，拖拽切换</button>
         </p>
     <el-divider></el-divider>
@@ -510,23 +507,25 @@ this.graph.on('node:mouseup', (e) => {
       this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
       this.graph.render() ; // 渲染图
     }
-    ,handleAddLine(){
-      this.graphData.edges.push( {
-        source: 'node1', // 起始点 id
-        target: 'node2', // 目标点 id
-        label: '发送请求', // 边的文本
-      });
-      this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
-      this.graph.render() ; // 渲染图
-    }
     ,handleAddRect(){
       this.graphData.nodes.push( {
-        id: 'node',
-        x: 500,
-        y: 100,
+        id: this.getProjectNum() + Math.floor(Math.random() * 100000000), // 节点的唯一标识
+        type:'rectNode',
+        x: 180, // 节点横坐标
+        y: 100, // 节点纵坐标
         width:130,
         height:30,
-        label: '新节点',
+        node_desc:'',
+        node_application:'',
+        node_father:'',
+        node_own:'',
+        anchorPoints:[
+        [0.5,0], // 左侧中间
+        [0.5, 1], // 右侧中间
+        [1,0.5], // 右侧中间
+        [0, 0.5], // 右侧中间
+      ],
+        label: '新节点', // 节点文本
       });
       this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
       this.graph.render() ; // 渲染图
