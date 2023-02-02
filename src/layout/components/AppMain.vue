@@ -23,7 +23,7 @@ export default {
   min-height: calc(100vh - 50px);
   width: 100%;
   position: relative;
-  overflow: hidden;
+  /*overflow: hidden;   设置这个可隐藏滚动条 */
 }
 .fixed-header+.app-main {
   padding-top: 50px;
