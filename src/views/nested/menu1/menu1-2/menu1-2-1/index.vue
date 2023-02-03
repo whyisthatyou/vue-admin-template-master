@@ -13,12 +13,15 @@
     </ul>
 
     <ul v-show="true" :style="edge_css_style" class="contextmenu">
-      <li @click="handleEdgeCopy()">复制</li>
       <li @click="handleEdgeEdit()">编辑</li>
       <li @click="handleEdgeDelete()">删除</li>
     </ul>
     <el-col :span="21">
-    <el-input id= "edge_label"  @change="handlerEdgeLabelChange" @keyup.enter.native="handlerEdgeLabelChange"  size="small" v-show="true" :style="edge_label_css_style"  type="test" :rows="1" placeholder="" v-model="edge_label_edit" >
+    <el-input id= "edge_label"   size="small" v-show="true" :style="edge_label_css_style"  type="test" :rows="1" placeholder="请输入文本" v-model="edge_label_edit" >
+         </el-input>
+         <el-input id= "edge_source_ipPort"   size="small" v-show="true" :style="edge_label_css_style"  type="test" :rows="1" placeholder="请输入源IP端口" v-model="edge_source_ipPort" >
+         </el-input>
+         <el-input id= "edge_target_ipPort"  @change="handlerEdgeLabelChange" @keyup.enter.native="handlerEdgeLabelChange"  size="small" v-show="true" :style="edge_label_css_style"  type="test" :rows="1" placeholder="请输入目标IP端口" v-model="edge_target_ipPort" >
          </el-input>
     </el-col>
     </div>
@@ -38,31 +41,34 @@
         <el-input id= "node_height" size="small" style="position:absolute;top:150px;right:40px;width: 300px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[nodeItemNo].height>
          <template slot="prepend"> 高度   </template>
         </el-input>
-         <el-input id= "node_label" size="small" style="position:absolute;top:180px;right:40px;width: 300px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[nodeItemNo].label>
+         <el-input id= "node_label" size="small" style="position:absolute;top:180px;right:40px;width: 300px;" type="textarea" :rows="3" placeholder="请输入内容" v-model=graphData.nodes[nodeItemNo].label>
          <template slot="prepend">正文</template>
          </el-input>
-         <el-input id= "node_desc" size="small" style="position:absolute;top:210px;right:40px;width: 300px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[nodeItemNo].node_desc>
+         <el-input id= "node_desc" size="small" style="position:absolute;top:240px;right:40px;width: 300px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[nodeItemNo].node_desc>
          <template slot="prepend">补充</template>
          </el-input>
-         <el-input id= "node_application" size="small" style="position:absolute;top:240px;right:40px;width: 300px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[nodeItemNo].node_application>
+         <el-input id= "node_application" size="small" style="position:absolute;top:270px;right:40px;width: 300px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[nodeItemNo].node_application>
          <template slot="prepend">应用名</template>
          </el-input>
-         <el-input id= "node_father" size="small" style="position:absolute;top:270px;right:40px;width: 300px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[nodeItemNo].node_father>
+         <el-input id= "node_father" size="small" style="position:absolute;top:300px;right:40px;width: 300px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[nodeItemNo].node_father>
          <template slot="prepend">归属业务</template>
          </el-input>
-         <el-input id= "node_own" size="small" style="position:absolute;top:300px;right:40px;width: 300px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[nodeItemNo].node_own>
+         <el-input id= "node_own" size="small" style="position:absolute;top:330px;right:40px;width: 300px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[nodeItemNo].node_own>
          <template slot="prepend">是否父业务</template>
          </el-input>
-         <p class="form-item" style="position:absolute;top:330px;right:40px;width: 150px;">
+         <el-input id= "node_target_label" size="small" style="position:absolute;top:360px;right:40px;width: 300px;" type="test" :rows="1" placeholder="请输入内容" v-model=graphData.nodes[nodeItemNo].node_target_label>
+         <template slot="prepend">关键字</template>
+         </el-input>
+         <p class="form-item" style="position:absolute;top:390px;right:40px;width: 150px;">
           <button @click.prevent="handleSubmit">更新属性</button>
         </p>
-        <p class="form-item" style="position:absolute;top:360px;right:40px;width: 150px;">
+        <p class="form-item" style="position:absolute;top:390px;right:190px;width: 150px;">
           <button @click.prevent="handleAddRect">新增矩形节点</button>
         </p>
-        <p class="form-item" style="position:absolute;top:390px;right:40px;width: 150px;">
+        <p class="form-item" style="position:absolute;top:420px;right:40px;width: 150px;">
           <button @click.prevent="handleSave">保存整个流程图</button>
         </p>
-        <p class="form-item" style="position:absolute;top:420px;right:40px;width: 150px;">
+        <p class="form-item" style="position:absolute;top:420px;right:190px;width: 150px;">
           <button @click.prevent="handleReadSaveFile">读取备份流程图</button>
         </p>
         <p class="form-item" style="position:absolute;top:450px;right:40px;width: 150px;">
@@ -93,6 +99,8 @@ export default {
       edge_css_style:{left:-300+'px',top:-300+'px'}, 
       edge_label_css_style:{width: '140px',left:-300+'px',top:-300+'px'},
       edge_label_edit:'',
+      edge_source_ipPort:'',
+      edge_target_ipPort:'',
       edge_label_id:0,
       nodeItemNo:0,
       // 【步骤3】 准备数据
@@ -100,12 +108,17 @@ export default {
         // 点集
     nodes: [
       {
-        id: 'node1', // 节点的唯一标识
+        id: '2023020311000000', // 节点的唯一标识
         type:'rectNode',
-        x: 100, // 节点横坐标
-        y: 100, // 节点纵坐标
+        x: 30, // 节点横坐标
+        y: 30, // 节点纵坐标
         width:130,
         height:30,
+        node_desc:'',
+        node_application:'',
+        node_father:'',
+        node_own:'',
+        node_target_label:'',
         anchorPoints:[
         [0.5,0], // 左侧中间
         [0.5, 1], // 右侧中间
@@ -113,51 +126,6 @@ export default {
         [0, 0.5], // 右侧中间
       ],
         label: '发起订单信息 \t \n 查询请求', // 节点文本
-      },
-      {
-        id: 'node2',
-        type:'rectNode',
-        x: 300,
-        y: 100,
-        width:130,
-        height:30,
-        anchorPoints:[
-        [0.5,0], // 左侧中间
-        [0.5, 1], // 右侧中间
-        [1,0.5], // 右侧中间
-        [0, 0.5], // 右侧中间
-      ],
-        label: '接收订单查询请求',
-      },
-      {
-        id: 'node3',
-        type:'rectNode',
-        x: 300,
-        y: 200,
-        width:130,
-        height:30,
-        anchorPoints:[
-        [0.5,0], // 左侧中间
-        [0.5, 1], // 右侧中间
-        [1,0.5], // 右侧中间
-        [0, 0.5], // 右侧中间
-      ],
-        label: '查询cops_order_info \n,返回订单信息',
-      },
-      {
-        id: 'node4',
-        type:'rectNode',
-        x: 100,
-        y: 300,
-        width:130,
-        height:30,
-        anchorPoints:[
-        [0.5,0], // 左侧中间
-        [0.5, 1], // 右侧中间
-        [1,0.5], // 右侧中间
-        [0, 0.5], // 右侧中间
-      ],
-        label: '返回结果',
       },
     ],
     // 边集
@@ -357,12 +325,18 @@ G6.registerNode('rectNode', {
   },
      
       })
-
+      this.graph.setMode('edit');   // 设置模式为编辑模式，不允许拖动
       // 【步骤5】 匹配数据源并渲染
       console.log(containerG6.offsetWidth)
-      this.graph.data(this.graphData) // 读取 Step 2 中的数据源到图上
-      this.graph.render() // 渲染图
-
+      // 读取public下的data.json文件数据获取数据
+      this.$axios.get('/data.json').then(res => {     // 获取public下的data.json文件数据
+        this.graphData=res.data;
+        this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
+        this.graph.render() ; // 渲染图
+    //  this.graph.data(this.graphData) // 读取 Step 2 中的数据源到图上
+    //  this.graph.render() // 渲染图
+  })
+    
 
       //定义右键菜单项
 // 在实际开发中，右键菜单内容可以使用JSX或HTML中的模板
@@ -386,9 +360,8 @@ this.graph.on('node:mouseleave', (e) => {
 });
 // 点击节点
 this.graph.on('node:click', (e) => {
-// 调用获取当前日期的方法加四位随机数  赋值表单中的项目编号
-const timenumber = this.getProjectNum() + Math.floor(Math.random() * 100000000)  // 如果是6位或者8位随机数，相应的 *1000000或者 *100000000就行了
-console.log(timenumber)
+
+
       // 鼠标划过时获取node在nodes数组的编号
       for (let i=0; i<this.graphData.nodes.length; i++){
 				if (this.graphData.nodes[i].id == this.nodeNo){
@@ -490,6 +463,7 @@ this.graph.on('node:mouseup', (e) => {
 
 
     }
+    // 更新节点属性
     , handleSubmit() {
       
       let node_label =  document.getElementById('node_label').value;
@@ -507,8 +481,10 @@ this.graph.on('node:mouseup', (e) => {
       this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
       this.graph.render() ; // 渲染图
     }
+    // 新增节点
     ,handleAddRect(){
       this.graphData.nodes.push( {
+        // 调用获取当前日期的方法加四位随机数  赋值表单中的项目编号
         id: this.getProjectNum() + Math.floor(Math.random() * 100000000), // 节点的唯一标识
         type:'rectNode',
         x: 180, // 节点横坐标
@@ -519,6 +495,7 @@ this.graph.on('node:mouseup', (e) => {
         node_application:'',
         node_father:'',
         node_own:'',
+        node_target_label:'',
         anchorPoints:[
         [0.5,0], // 左侧中间
         [0.5, 1], // 右侧中间
@@ -530,6 +507,7 @@ this.graph.on('node:mouseup', (e) => {
       this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
       this.graph.render() ; // 渲染图
     }
+    // 复制节点
     ,handleNodeCopy(){
       this.graphData.nodes.push({
         id: this.getProjectNum() + Math.floor(Math.random() * 100000000), // 节点的唯一标识
@@ -542,6 +520,7 @@ this.graph.on('node:mouseup', (e) => {
         node_application:'',
         node_father:'',
         node_own:'',
+        node_target_label:'',
         anchorPoints:[
         [0.5,0], // 左侧中间
         [0.5, 1], // 右侧中间
@@ -558,6 +537,7 @@ this.graph.on('node:mouseup', (e) => {
       this.graph.render() ; // 渲染图
       
     }
+    // 删除节点
     ,handleNodeDelete(){
       for (let i=0; i<this.graphData.nodes.length; i++){
 				if (this.graphData.nodes[i].id == this.nodeNo){
@@ -569,19 +549,8 @@ this.graph.on('node:mouseup', (e) => {
         this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
         this.graph.render() ; // 渲染图
     }
-    ,handleEdgeCopy(){
-      this.graphData.edges.push( {
-        id:'edges111',
-        source: 'node1', // 起始点 id
-        target: 'node2', // 目标点 id
-        label: '', // 边的文本
-      });  // TODU 这里是创建了新节点，而不是复制节点
-      this.edge_css_style.left =-300 +'px'; // 隐藏右键菜单项
-      this.edge_css_style.top = -300 +'px'; // 隐藏右键菜单项
-      this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
-      this.graph.render() ; // 渲染图
-      
-    }
+
+    // 删除边
     ,handleEdgeDelete(){
       for (let i=0; i<this.graphData.edges.length; i++){
 				if (this.graphData.edges[i].id == this.edgeNo){
@@ -593,6 +562,7 @@ this.graph.on('node:mouseup', (e) => {
         this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
         this.graph.render() ; // 渲染图
     }
+    // 保存流程图
     ,handleSave(){
       var data = JSON.stringify(this.graphData)
       let uri = 'data:text/csv;charset=utf-8,\ufeff' + encodeURIComponent(data);
@@ -607,7 +577,7 @@ this.graph.on('node:mouseup', (e) => {
 
 
     }
-
+    // 从备份文件读取流程图
     ,handleReadSaveFile(){
         this.$axios.get('/data.json').then(res => {     // 获取public下的test.json文件数据
         this.graphData=res.data;
@@ -615,19 +585,21 @@ this.graph.on('node:mouseup', (e) => {
         this.graph.render() ; // 渲染图
   })
     }
+    // 切换编辑模式
     ,handleChangeMode(){
       if(this.dragMode == 1){
-        this.graph.setMode('edit');
+        this.graph.setMode('default');
         this.dragMode=0;
       }
       else{
-        this.graph.setMode('default');
+        this.graph.setMode('edit');
         this.dragMode=1;
       }
       
         this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
         this.graph.render() ; // 渲染图
     }
+   
     ,handleEdgeEdit(){
       for (let i=0; i<this.graphData.edges.length; i++){
 				if (this.graphData.edges[i].id == this.edgeNo){
@@ -641,8 +613,11 @@ this.graph.on('node:mouseup', (e) => {
         this.edge_css_style.top = -300 +'px'; // 隐藏右键菜单项
 
     }
+    // 边的文字修改
     ,handlerEdgeLabelChange(){
           this.graphData.edges[this.edge_label_id].label=this.edge_label_edit;
+          this.graphData.edges[this.edge_label_id].edge_source_ipPort=this.edge_source_ipPort;
+          this.graphData.edges[this.edge_label_id].edge_target_ipPort=this.edge_target_ipPort;
           this.graph.data(this.graphData)  ;  // 读取 Step 2 中的数据源到图上
           this.graph.render() ; // 渲染图
         this.edge_label_css_style.left =-300 +'px'; // 隐藏右键菜单项
@@ -678,6 +653,7 @@ this.graph.on('node:mouseup', (e) => {
     top: 30px;
     right: 0;
     width: 300px;
+    white-space: pre-wrap;
 }
 .contextmenu {
   margin: 0;
