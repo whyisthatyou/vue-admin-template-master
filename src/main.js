@@ -15,6 +15,14 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 
+
+
+
+import VXETable from 'vxe-table'
+import 'vxe-table/lib/style.css'
+
+Vue.use(VXETable)
+Vue.prototype.$VXETable = VXETable
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -23,13 +31,14 @@ import '@/permission' // permission control
  * Currently MockJs will be used in the production environment,
  * please remove it before going online ! ! !
  */
-if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()
-}
 
 import axios from 'axios'  // 安装axios后引入
 Vue.prototype.$axios = axios  // 将axios挂载到原型上方便使用
+
+import Mock from 'mockjs'
+Mock.mock('http://localhost:9528/api/aaa/bbb', { 'code': '0', 'msg': 'success', 'data': 'dlsajfkdas' })
 
 // set ElementUI lang to EN
 Vue.use(ElementUI, { locale })

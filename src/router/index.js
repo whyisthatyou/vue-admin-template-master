@@ -65,7 +65,7 @@ export const constantRoutes = [    //配置路由，这里是个数组
     component: Layout,
     redirect: '/example/table',
     name: 'Example',
-    meta: { title: '银联二维码', icon: 'el-icon-s-help' },
+    meta: { title: '任务配置', icon: 'el-icon-s-help' },
     children: [
       {
         path: 'table',
@@ -90,7 +90,7 @@ export const constantRoutes = [    //配置路由，这里是个数组
         path: 'index',
         name: 'Form',
         component: () => import('@/views/form/index'),
-        meta: { title: '银联无卡', icon: 'form' }
+        meta: { title: '任务运维', icon: 'form' }
       }
     ]
   },
@@ -168,7 +168,7 @@ export const constantRoutes = [    //配置路由，这里是个数组
   },
 
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  // { path: '*', redirect: '/404', hidden: true }
 ]
 //创建路由的实例对象
 const createRouter = () => new Router({

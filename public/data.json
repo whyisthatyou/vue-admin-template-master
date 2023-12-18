@@ -1,1 +1,15 @@
-{"nodes":[{"id":"2023020311000000","type":"rectNode","x":30,"y":30,"width":"100","height":30,"node_desc":"无","node_application":"upac#upac-cops-service#com.czb.upac.manager.CreateOrderManager","node_father":"6002-订单创建（收单）-acqCreateOrder","node_own":"否","node_target_label":"订单创建（收单）业务处理","anchorPoints":[[0.5,0],[0.5,1],[1,0.5],[0,0.5]],"label":"接收订单创建请求 ","size":[100,30],"style":{"hover":{"fill":"lightsteelblue"},"click":{"stroke":"#666","lineWidth":3},"fill":"steelblue","stroke":"#666","lineWidth":1},"labelCfg":{"style":{"fill":"#fff"}}}],"edges":[]}
+{"nodes":[
+    {"id":"1", "label":"Node 1"}
+    ,{"id":"2", "label":"Node 2\nline 2"}
+    ,{"id":"3", "label":"Node 3"}
+    ,{"id":"4", "label":"Node 4"}
+    ,{"id":"5", "label":"Node 5"}
+  ],
+  "edges":[
+    {"from":"1", "to":"2", "label":"apples"}
+    ,{"from":"1", "to":"3", "label":"bananas"}
+    ,{"from":"2", "to":"4", "label":"cherries"}
+    ,{"from":"2", "to":"5", "label":"dates"}
+    ,{"from":"2", "to":"3", "label":"EAGLES!", "color":{"color":"green", "highlight":"blue"}, "arrows":{"to":{"scaleFactor":"1.25", "type":"circle"}}}
+  ]
+  }

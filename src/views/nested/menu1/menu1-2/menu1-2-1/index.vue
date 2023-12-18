@@ -444,7 +444,7 @@ this.graph.on('node:mouseup', (e) => {
      //   console.log("节点：拖动关键图形");
       } else if(typeof e.item != "undefined" && this.mousedownSource != e.item.getModel().id){
       //  console.log("节点：拖动锚点");
-        const uid = Math.round(Math.random() * 100 + 100);
+        const uid = Math.round(Math.random() * 1000000 + 1000000) ;
         this.graphData.edges.push( {
         id:uid,
         source: this.mousedownSource, // 起始点 id

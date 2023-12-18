@@ -1,79 +1,132 @@
 <template>
-  <div class="app-container">
-    <el-table
-      v-loading="listLoading"
-      :data="list"
-      element-loading-text="Loading"
-      border
-      fit
-      highlight-current-row
-    >
-      <el-table-column align="center" label="ID" width="95">
-        <template slot-scope="scope">
-          {{ scope.$index }}
-        </template>
-      </el-table-column>
-      <el-table-column label="Title">
-        <template slot-scope="scope">
-          {{ scope.row.title }}
-        </template>
-      </el-table-column>
-      <el-table-column label="Author" width="110" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Pageviews" width="110" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.pageviews }}
-        </template>
-      </el-table-column>
-      <el-table-column class-name="status-col" label="Status" width="110" align="center">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" prop="created_at" label="Display_time" width="200">
-        <template slot-scope="scope">
-          <i class="el-icon-time" />
-          <span>{{ scope.row.display_time }}</span>
-        </template>
-      </el-table-column>
-    </el-table>
-  </div>
-</template>
-
-<script>
-import { getList } from '@/api/table'
+ <vxe-grid
+          border
+          resizable
+          keep-source
+          ref="xGrid"
+          id="toolbar_demo_1"
+          height="500"
+          :print-config="{}"
+          :import-config="{}"
+          :export-config="{}"
+          :columns="tableColumn"
+          :toolbar-config="tableToolbar"
+          :data="tableData"
+          :custom-config="{storage: true}"
+          :edit-config="{trigger: 'click', mode: 'row', showStatus: true}"
+          @toolbar-button-click="toolbarButtonClickEvent"
+          @toolbar-tool-click="toolbarToolClickEvent">
+          <template #name_edit="{ row }">
+            <vxe-input v-model="row.name"></vxe-input>
+          </template>
+          <template #nickname_edit="{ row }">
+            <vxe-input v-model="row.nickname"></vxe-input>
+          </template>
+          <template #role_edit="{ row }">
+            <vxe-input v-model="row.role"></vxe-input>
+          </template>
+          <template #address_edit="{ row }">
+            <vxe-input v-model="row.address"></vxe-input>
+          </template>
+        </vxe-grid>
+  </template>
+  
+  <script>
 
 export default {
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'gray',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    }
-  },
-  data() {
-    return {
-      list: null,
-      listLoading: true
-    }
-  },
-  created() {
-    this.fetchData()
-  },
-  methods: {
-    fetchData() {
-      this.listLoading = true
-      getList().then(response => {
-        this.list = response.data.items
-        this.listLoading = false
-      })
-    }
-  }
-}
-</script>
+          data () {
+            return {
+              tableData: [],
+              tableToolbar: {
+                buttons: [
+                  { code: 'myInsert', name: '新增' },
+                  { code: 'mySave', name: 'app.body.button.save', status: 'success' },
+                  { code: 'myExport', name: '导出数据', type: 'text', status: 'warning' },
+                  {
+                    name: '禁用按钮',
+                    disabled: false,
+                    dropdowns: [
+                      { code: 'other1', name: '下拉的按钮1', type: 'text', disabled: false },
+                      { code: 'other2', name: '下拉的按钮2', type: 'text', disabled: true },
+                      { code: 'other3', name: '下拉的按钮3', type: 'text', disabled: false }
+                    ]
+                  }
+                ],
+                tools: [
+                  { code: 'myPrint', name: '自定义打印' }
+                ],
+                refresh: true,
+                import: true,
+                export: true,
+                print: true,
+                zoom: true,
+                custom: true
+              },
+              tableColumn: [
+                { type: 'checkbox', width: 50 },
+                { type: 'seq', width: 60 },
+                { field: 'name', title: 'Name', editRender: {}, slots: { edit: 'name_edit' } },
+                {
+                  title: '分类',
+                  children: [
+                    { field: 'nickname', title: 'Nickname', editRender: { autofocus: '.vxe-input--inner' }, slots: { edit: 'nickname_edit' } },
+                    { field: 'role', title: 'Role', editRender: {}, slots: { edit: 'role_edit' } }
+                  ]
+                },
+                { field: 'address', title: 'Address', showOverflow: true, editRender: {}, slots: { edit: 'address_edit' } }
+              ]
+            }
+          },
+          created () {
+            this.loadData()
+          },
+          methods: {
+            loadData () {
+              this.tableData = [
+                { id: 10001, name: 'Test1', nickname: 'T1', role: 'Develop', sex: 'Man', age: 28, address: 'Shenzhen' },
+                { id: 10002, name: 'Test2', nickname: 'T2', role: 'Test', sex: 'Women', age: 22, address: 'Guangzhou' },
+                { id: 10003, name: 'Test3', nickname: 'T3', role: 'PM', sex: 'Man', age: 32, address: 'Shanghai' },
+                { id: 10004, name: 'Test4', nickname: 'T4', role: 'Designer', sex: 'Women', age: 23, address: 'Shenzhen' },
+                { id: 10005, name: 'Test5', nickname: 'T5', role: 'Develop', sex: 'Women', age: 30, address: 'Shanghai' },
+                { id: 10006, name: 'Test6', nickname: 'T6', role: 'Designer', sex: 'Women', age: 21, address: 'Shenzhen' },
+                { id: 10007, name: 'Test7', nickname: 'T7', role: 'Test', sex: 'Man', age: 29, address: 'Guangzhou' },
+                { id: 10008, name: 'Test8', nickname: 'T8', role: 'Develop', sex: 'Man', age: 35, address: 'Shenzhen' },
+                { id: 10009, name: 'Test9', nickname: 'T9', role: 'Test', sex: 'Man', age: 24, address: 'Shenzhen' },
+                { id: 100010, name: 'Test10', nickname: 'T10', role: 'Develop', sex: 'Man', age: 20, address: 'Guangzhou' }
+              ]
+            },
+            toolbarButtonClickEvent ({ code }) {
+              const $grid = this.$refs.xGrid
+              switch (code) {
+                case 'myInsert':
+                  $grid.insert({
+                    name: 'xxx'
+                  })
+                  break
+                case 'mySave':
+                  setTimeout(() => {
+                    const { insertRecords, removeRecords, updateRecords } = $grid.getRecordset()
+                    VXETable.modal.message({ content: `新增 ${insertRecords.length} 条，删除 ${removeRecords.length} 条，更新 ${updateRecords.length} 条`, status: 'success' })
+                    this.loadData()
+                  }, 100)
+                  break
+                case 'myExport':
+                  $grid.exportData({
+                    type: 'csv'
+                  })
+                  break
+              }
+            },
+            toolbarToolClickEvent ({ code }) {
+              const $grid = this.$refs.xGrid
+              switch (code) {
+                case 'myPrint':
+                  $grid.print()
+                  break
+              }
+            }
+          }
+        }
+        
+        
+        </script>
